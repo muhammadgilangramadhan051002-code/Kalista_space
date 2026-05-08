@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalista Space</title>
+    <style>
+        :root { --primary: #00d2ff; --secondary: #9d50bb; --bg: #050510; }
+        body { background: var(--bg); color: white; margin: 0; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .universe { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle, #1b2735 0%, #090a0f 100%); z-index: -1; }
+        .container { width: 90%; max-width: 400px; padding: 25px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 0 20px rgba(0,210,255,0.3); }
+        h1 { background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 10px; border: 1px solid var(--primary); background: rgba(0,0,0,0.5); color: white; text-align: center; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
+        .options-grid { display: grid; gap: 10px; margin-top: 20px; }
+        .opt-btn { padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; color: white; cursor: pointer; text-align: left; }
+        .correct { background: #27ae60 !important; }
+        .wrong { background: #c0392b !important; }
+        #quiz-screen, #result-screen { display: none; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        #progress { width: 0%; height: 100%; background: var(--primary); transition: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="universe"></div>
+    <div class="container">
+        <div id="start-screen">
+            <h1>Kalista Space</h1>
+            <input type="text" id="p-name" placeholder="Masukkan Nama...">
+            <button class="btn" onclick="start()">PLAY</button>
+        </div>
+        <div id="quiz-screen">
+            <div class="progress-bar"><div id="progress"></div></div>
+            <div id="q-text" style="margin-bottom: 15px;"></div>
+            <div id="opts" class="options-grid"></div>
+            <button id="next" class="btn" onclick="showQ()" style="display:none; margin-top:15px;">NEXT</button>
+        </div>
+        <div id="result-screen">
+            <h2 id="res-name"></h2>
+            <div id="res-score" style="font-size: 2.5rem; color: var(--primary);"></div>
+            <p id="res-grade"></p>
+            <p id="res-status" style="font-style: italic;"></p>
+            <button class="btn" onclick="location.reload()">ULANGI</button>
+        </div>
+    </div>
+    <script>
+        const data = [
+            {q:"Planet terbesar di Tata Surya?", a:"Jupiter", o:["Mars","Jupiter","Venus","Merkurius"]},
+            {q:"Planet terdekat dengan Matahari?", a:"Merkurius", o:["Merkurius","Saturnus","Mars","Bumi"]},
+            {q:"Planet merah disebut?", a:"Mars", o:["Venus","Saturnus","Mars","Neptunus"]},
+            {q:"Planet dengan cincin paling jelas?", a:"Saturnus", o:["Saturnus","Jupiter","Bumi","Mars"]},
+            {q:"Planet biru dijuluki?", a:"Uranus", o:["Mars","Uranus","Venus","Merkurius"]}
+        ];
+        let curr = 0, score = 0, pName = "";
+        function start() {
+            pName = document.getElementById('p-name').value || "Astronaut";
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            showQ();
+        }
+        function showQ() {
+            if(curr >= data.length) return end();
+            document.getElementById('next').style.display = 'none';
+            let q = data[curr];
+            document.getElementById('q-text').innerText = q.q;
+            let oDiv = document.getElementById('opts');
+            oDiv.innerHTML = '';
+            document.getElementById('progress').style.width = (curr/data.length)*100 + '%';
+            q.o.forEach(opt => {
+                let b = document.createElement('button');
+                b.className = 'opt-btn'; b.innerText = opt;
+                b.onclick = () => {
+                    if(opt === q.a) { b.classList.add('correct'); score++; }
+                    else { b.classList.add('wrong'); }
+                    document.querySelectorAll('.opt-btn').forEach(btn=>btn.style.pointerEvents='none');
+                    document.getElementById('next').style.display = 'block';
+                };
+                oDiv.appendChild(b);
+            });
+            curr++;
+        }
+        function end() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            document.getElementById('res-name').innerText = "Selamat " + pName + " 🚀";
+            document.getElementById('res-score').innerText = score + "/" + data.length;
+            let grade = (score/data.length)*100;
+            document.getElementById('res-grade').innerText = "Nilai Akhir: " + grade;
+            document.getElementById('res-status').innerText = grade >= 60 ? "Status: Penjelajah Antariksa 🌌" : "Status: Kadet Ruang Angkasa 🛰️";
+        }
+    </script>
+</body>
+</html>
+
